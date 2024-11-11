@@ -19,9 +19,10 @@ PImage principalPage, selectYourCharacter, howToPlay, credits, setting, characte
 int screen = 0, characterVariable = 1;
 boolean oke = false;
 boolean map1, map2, map3 =false;
+boolean levelLocked2 = true, levelLocked3 = true;
 DoublyList characterSelector;
 
-void setup(){
+void setup() {
   mouse = createFont("PressStart2P.ttf", 20);
   size(1500, 720);
   backgroundImage = loadImage("FONDO MAPA VIDEOJUEGO.png");
@@ -33,7 +34,7 @@ void setup(){
   youLose.resize(width, height);
   next = loadImage("next.png");
   textBox = loadImage("textBox.png");
-  
+
   principalPage = loadImage("Start.png");
   selectYourCharacter = loadImage("SelectYourCharacter.png");
   howToPlay = loadImage("How To Play.png");
@@ -43,11 +44,11 @@ void setup(){
   start = loadImage("Start.png");
   okn = loadImage("Okselect.png");
   mapa = loadImage("Mapa.png");
-  
+
   game = new WebWarriors(this);
   game.addSong("music1.mp3");
   game.addSong("music2.mp3");
-  
+
   //Plataformas
   game.addPlatform(new Platform(0, 625, 465, 15));
   game.addPlatform(new Platform(465, 560, 168, 15));
@@ -69,26 +70,26 @@ void setup(){
   game.addPlatform(new Platform(6527, 355, 352, 15));
   game.addPlatform(new Platform(7096, 560, 126, 15));
   game.addPlatform(new Platform(7223, 488, 688, 55));
-  
+
   mainCharacter = new Character(this, "F", 5, 0, 0, 5);
-  
+
   battleCharacter = new Character(this, "B", 10, 200, 300, 5);
   enemy1 = new Character(this, "A", 10, 1000, 0, 5);
-  
+
   battle1xPositions = new SimpleList();
   battle1xPositions.addNode(545);
   battle1xPositions.addNode(1000);
   battle1xPositions.addNode(545);
   battle1xPositions.addNode(1000);
   battle1xPositions.addNode(50);
-  
+
   battle1yPositions = new SimpleList();
   battle1yPositions.addNode(537);
   battle1yPositions.addNode(537);
   battle1yPositions.addNode(630);
   battle1yPositions.addNode(630);
   battle1yPositions.addNode(537);
-  
+
   // Crear listas de texto y posiciones para las batallas
   battle1Texts = new SimpleList();
   battle1Texts.addNode("1");
@@ -96,33 +97,32 @@ void setup(){
   battle1Texts.addNode("3");
   battle1Texts.addNode("4");
   battle1Texts.addNode("");
-  
+
   comments = new SimpleList();
   comments.addNode("buenos dias\ncomo estas\ncomo te llamas");
   comments.addNode("me gusta la papaaaaa");
   comments.addNode("3");
   comments.addNode("4");
   comments.addNode("5");
-  
+
   // Crear batallas
   battle1 = new Battle(this, battle1Texts, battle1xPositions, battle1yPositions, game, comments);
   battle2 = new Battle(this, battle1Texts, battle1xPositions, battle1yPositions, game, comments); // Puedes personalizar otra batalla
-  
+
   // Agregar batallas a WebWarriors
   game.addBattle(battle1);
   game.addBattle(battle2);
-  
+
   characterSelector = new DoublyList();
   characterSelector.addNode(loadImage("SelPersonaje1.png"));
   characterSelector.addNode(loadImage("SelPersonaje2.png"));
   characterSelector.addNode(loadImage("SelPersonaje3.png"));
   characterSelector.addNode(loadImage("SelPersonaje4.png"));
   characterSelector.addNode(loadImage("SelPersonaje5.png"));
-  
 }
 
-void draw(){
-  
+void draw() {
+
   background(0);
   if (screen == 0) {
     image(principalPage, 0, 0, width, height);
@@ -135,7 +135,6 @@ void draw(){
     }
 
     characterSelector.displayCharacter();
-    
   } else if (screen == 2) {
     image(credits, 0, 0, width, height);
   } else if (screen == 3) {
@@ -144,80 +143,81 @@ void draw(){
     image(setting, 0, 0, width, height);
   } else if (screen == 5) {
     image(mapa, 0, 0, width, height);
-    if(map1){
-        image(backgroundImage, -backgroundOffset, 0);
-        //BATALLAS EN JUEGO
-        if (game.isBattleActive()) {
-          game.updateBattle();
-          battleCharacter.display(this);
-          enemy1.display(this);
-        } else if(showYouWon){
-          finishTime = millis() - startTime;
-          if (finishTime < 5000) {
-            image(youWon, 0, 0); // Muestra la imagen en (100, 100)
-          } else {
-            showYouWon = false; // Deja de mostrar la imagen después de 5 segundos
-          }
-        }else if(showYouLose){
-          finishTime = millis() - startTime;
-          if (finishTime < 5000) {
-            image(youLose, 0, 0); // Muestra la imagen en (100, 100)
-          } else {
-            showYouLose = false; // Deja de mostrar la imagen después de 5 segundos
-          }
-        }else{
-          //JUEGO PLATAFORMAS
-          mainCharacter.move(this);
-          mainCharacter.display(this);
-          moveBackground();
-          
-          // Mostrar plataformas
-          Node platformNode = game.getPlatforms().PTR;
-          while (platformNode != null) {
-            Platform platform = (Platform) platformNode.info;
-            platform.display(this);
-            platformNode = platformNode.next;
-          }
-          
-          // Verificar colisión con plataformas
-          if (CollisionDetector.isColliding(mainCharacter, (SimpleList)game.getPlatforms(), backgroundOffset)) {
-            mainCharacter.setOnGround(true);
-          } else {
-            mainCharacter.setOnGround(false);
-          }
-          
-          //CONTROL DE BATALLAS
-          if(mainCharacter.gifPlayer.getX() + mainCharacter.gifPlayer.getWidth() + backgroundOffset >= 4036 && !booleanBattle1){
-            print("llegue");
-            game.setActiveBattle(0); // Comienza con la primera batalla
-            game.startBattle();
-            booleanBattle1 = true;
-          }else if(mainCharacter.gifPlayer.getX() + mainCharacter.gifPlayer.getWidth() + backgroundOffset >= 5000 && !booleanBattle2){
-            print("llegue");
-            game.nextBattle();
-            booleanBattle2 = true;
-          }else if(mainCharacter.gifPlayer.getX() + mainCharacter.gifPlayer.getWidth() + backgroundOffset >= 7000 && !booleanBattle3){
-            print("llegue");
-            game.nextBattle();
-            booleanBattle3 = true;
-          }
-          text("Press T for next battle", 50, 100);
+    if (map1) {
+      image(backgroundImage, -backgroundOffset, 0);
+      //BATALLAS EN JUEGO
+      if (game.isBattleActive()) {
+        game.updateBattle();
+        battleCharacter.display(this);
+        enemy1.display(this);
+      } else if (showYouWon) {
+        finishTime = millis() - startTime;
+        if (finishTime < 5000) {
+          image(youWon, 0, 0); // Muestra la imagen en (100, 100)
+          levelLocked2 = false;
+        } else {
+          showYouWon = false; // Deja de mostrar la imagen después de 5 segundos
         }
-    }else if(map2){
+      } else if (showYouLose) {
+        finishTime = millis() - startTime;
+        if (finishTime < 5000) {
+          image(youLose, 0, 0); // Muestra la imagen en (100, 100)
+        } else {
+          showYouLose = false; // Deja de mostrar la imagen después de 5 segundos
+        }
+      } else {
+        //JUEGO PLATAFORMAS
+        mainCharacter.move(this);
+        mainCharacter.display(this);
+        moveBackground();
+
+        // Mostrar plataformas
+        Node platformNode = game.getPlatforms().PTR;
+        while (platformNode != null) {
+          Platform platform = (Platform) platformNode.info;
+          platform.display(this);
+          platformNode = platformNode.next;
+        }
+
+        // Verificar colisión con plataformas
+        if (CollisionDetector.isColliding(mainCharacter, (SimpleList)game.getPlatforms(), backgroundOffset)) {
+          mainCharacter.setOnGround(true);
+        } else {
+          mainCharacter.setOnGround(false);
+        }
+
+        //CONTROL DE BATALLAS
+        if (mainCharacter.gifPlayer.getX() + mainCharacter.gifPlayer.getWidth() + backgroundOffset >= 4036 && !booleanBattle1) {
+          print("llegue");
+          game.setActiveBattle(0); // Comienza con la primera batalla
+          game.startBattle();
+          booleanBattle1 = true;
+        } else if (mainCharacter.gifPlayer.getX() + mainCharacter.gifPlayer.getWidth() + backgroundOffset >= 5000 && !booleanBattle2) {
+          print("llegue");
+          game.nextBattle();
+          booleanBattle2 = true;
+        } else if (mainCharacter.gifPlayer.getX() + mainCharacter.gifPlayer.getWidth() + backgroundOffset >= 7000 && !booleanBattle3) {
+          print("llegue");
+          game.nextBattle();
+          booleanBattle3 = true;
+        }
+        text("Press T for next battle", 50, 100);
+      }
+    } else if (map2) {
       print("map2");
       image(howToPlay, 0, 0, width, height);
-    }else if(map3){
+    } else if (map3) {
       print("map3");
       image(credits, 0, 0, width, height);
     }
   }
-  
+
   textFont(mouse);
   text("mouseX "+ mouseX + " mouseY " + mouseY + " offsetX" + backgroundOffset + " Total" + (int(mouseX) + backgroundOffset), 20, 20);
 }
 
 void mousePressed() {
-  
+
   float dx1 = 922, dy1 = 297, ix1 = 560, iy1 = 297;
   float dx2 = 974, dy2 = 358, ix2 = 509, iy2 = 358;
   float dx3 = 922, dy3 = 410, ix3 = 560, iy3 = 410;
@@ -242,26 +242,34 @@ void mousePressed() {
     } else if (mouseX > 694 && mouseX <792 && mouseY >600 && mouseY <650) {
       screen = 5;
     }
-  } else if(screen == 5 && !game.isBattleActive()){
-      if(mouseX>290 && mouseX<378 && mouseY>509 && mouseY<556){
-        map1 = true;
-        map2 = false;
-        map3 = false;
-      }else if(mouseX>1141 && mouseX<1245 && mouseY>637 && mouseY<692){
+  } else if (screen == 5 && !game.isBattleActive()) {
+    if (mouseX>290 && mouseX<378 && mouseY>509 && mouseY<556) {
+      map1 = true;
+      map2 = false;
+      map3 = false;
+    } else if (mouseX>1141 && mouseX<1245 && mouseY>637 && mouseY<692) {
+      if (levelLocked2) {
+        print("Level Locked");
+      } else {
         map1 = false;
         map2 = true;
         map3 = false;
-      }else if(mouseX>718 && mouseX<839 && mouseY>623 && mouseY<688){
+      }
+    } else if (mouseX>718 && mouseX<839 && mouseY>623 && mouseY<688) {
+      if (levelLocked3) {
+        print("Level Locked");
+      } else {
         map1 = false;
         map2 = false;
         map3 = true;
       }
+    }
   } else if (screen == 2 || screen == 3 || screen == 4) {
     if (mouseX > 20 && mouseX < 141 && mouseY > 29 && mouseY < 49) {
       screen = 0;
     }
   }
-  
+
   if (game.isBattleActive()) {
     game.mousePressed();
   }
@@ -305,16 +313,16 @@ void keyReleased() {
   }
 }
 
-void moveBackground(){
+void moveBackground() {
   if (mainCharacter.gifPlayer.getX() > width - 150 && backgroundOffset < backgroundWidth - width) {
     if (mainCharacter.getMoveRight()) {
       backgroundOffset += mainCharacter.getSpeed(); // Desplazar el principalPage a la derecha
-    }  
+    }
   }
   if (mainCharacter.gifPlayer.getX() < 150 && backgroundOffset > 0) {
     if (mainCharacter.getMoveLeft()) {
       backgroundOffset -= mainCharacter.getSpeed(); // Desplazar el principalPage a la izquierda
-    }  
+    }
   }
 }
 
