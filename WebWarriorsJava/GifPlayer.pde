@@ -11,15 +11,15 @@ public class GifPlayer {
   private int delayCounter; // Contador de retraso de cuadros
   private float speed; // Velocidad del movimiento
   
-  public GifPlayer(PApplet app, String folder, int numFrames, float x, float y) {
+  public GifPlayer(PApplet app, String folder, int numFrames, float x, float y, float width, float height) {
     this.app = app;  // Guardar la referencia para usar métodos de Processing
     this.frames = new SimpleList();
     this.numFrames = numFrames;
     this.frameIndex = 0;
     this.x = x;
     this.y = y;
-    this.width = 100;
-    this.height = 100;
+    this.width = width;
+    this.height = height;
     this.frameDelay = 5;
     this.delayCounter = 0;
     this.speed = 5;
@@ -35,13 +35,28 @@ public class GifPlayer {
   
   // Método para mostrar el GIF en la screen
   public void display(PApplet app) {
-      app.noFill();
+      /*app.noFill();
       app.stroke(255, 0, 0);  // Dibujar el marco de colisión
-      app.rect(x, y, width, height);
+      app.rect(x, y, width, height);*/
   
       if (numFrames > 0) {
           PImage currentFrame = (PImage) frames.getNode(frameIndex);
-          app.image(currentFrame, x, y);
+          app.image(currentFrame, x, y, width, height);
+      }
+  
+      // Lógica de avance de cuadros
+      delayCounter++;
+      if (delayCounter >= frameDelay) {
+          frameIndex = (frameIndex + 1) % numFrames;  // Avanzar al siguiente cuadro
+          delayCounter = 0;  // Reiniciar contador
+      }
+  }
+  
+  public void enemyDisplay(PApplet app, int xpos, int ypos){
+
+      if (numFrames > 0) {
+          PImage currentFrame = (PImage) frames.getNode(frameIndex);
+          app.image(currentFrame, xpos - backgroundOffset, ypos, width, height);
       }
   
       // Lógica de avance de cuadros

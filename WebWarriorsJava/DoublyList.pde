@@ -1,5 +1,7 @@
 public class DoublyList extends List {
   private DoublyNode current; // Nodo actual del personaje seleccionado
+  
+  private int characterNumber = 1;
 
   // Constructor
   public DoublyList() {
@@ -24,11 +26,15 @@ public class DoublyList extends List {
     FINAL.next = PTR;
     ((DoublyNode) PTR).setPrev((DoublyNode) FINAL);
   }
-
+  
   // Método para avanzar al siguiente personaje
   public void nextCharacter() {
     if (current != null) {
       current = (DoublyNode) current.next;
+      characterNumber += 1;
+      if(characterNumber == 6){
+        characterNumber = 1;
+      }
     }
   }
 
@@ -36,6 +42,10 @@ public class DoublyList extends List {
   public void prevCharacter() {
     if (current != null) {
       current = (DoublyNode) current.getPrev();
+      characterNumber -= 1;
+      if(characterNumber == 0){
+        characterNumber = 5;
+      }
     }
   }
 
@@ -46,4 +56,9 @@ public class DoublyList extends List {
       image(characterImage, 470, 125); // Ajusta las coordenadas según sea necesario
     }
   }
+  
+  public int getCharacterNumber(){
+    return characterNumber;
+  }
+  
 }

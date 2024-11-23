@@ -1,11 +1,13 @@
 public static class CollisionDetector {
   
-  public static boolean isColliding(Character character, SimpleList platforms, float backgroundOffset) {
+  public static boolean isColliding(int index, Character character, SimpleList platforms, float backgroundOffset) {
     Node current = platforms.PTR;
     while (current != null) {
       Platform platform = (Platform) current.info;
-      if (isCollidingWithPlatform(character, platform, backgroundOffset)) {
-        return true;
+      if(platform.getIndex() == index){
+          if (isCollidingWithPlatform(character, platform, backgroundOffset)) {
+            return true;
+          }
       }
       current = current.next;
     }
@@ -66,4 +68,35 @@ public static class CollisionDetector {
       }
     }
   }
+  
+  public static boolean isCollidingWithSpikes(int index, Character character, SimpleList spikes, float backgroundOffset) {
+    Node current = spikes.PTR;
+    while (current != null) {
+      Spike spike = (Spike) current.info;
+      // Coordenadas del personaje
+      float characterX = character.gifPlayer.getX();
+      float characterY = character.gifPlayer.getY();
+      float characterWidth = character.gifPlayer.getWidth();
+      float characterHeight = character.gifPlayer.getHeight();
+
+      // Coordenadas del spike, ajustadas al offset del fondo
+      float spikeX = spike.getX() - backgroundOffset;
+      float spikeY = spike.getY();
+      float spikeWidth = spike.getWidth();
+      float spikeHeight = spike.getHeight();
+
+      // Verificar colisión por coordenadas
+      boolean collisionX = characterX < spikeX + spikeWidth && characterX + characterWidth > spikeX;
+      boolean collisionY = characterY < spikeY + spikeHeight && characterY + characterHeight > spikeY;
+
+      if (collisionX && collisionY && spike.getIndex() == index) {
+          return true; // Colision
+      }
+
+      current = current.next; 
+    }
+    return false; // No hay colisión
+
+  }  
+
 }

@@ -45,4 +45,20 @@ public class SimpleList extends List{
 
     return count;  // Retornamos el tamaño de la lista
   }
+  
+    // Método para obtener el índice de un nodo en la lista
+  public int getIndex(Node node) {
+      Node current = PTR; // Comienza desde el primer nodo
+      int index = 0;      // Contador de índice
+  
+      while (current != null) {
+          if (current == node) { // Comparar referencias para encontrar el nodo
+              return index;
+          }
+          current = current.next; // Avanza al siguiente nodo
+          index++;
+      }
+      return -1; // Si el nodo no está en la lista, devuelve -1
+  }
+
 }

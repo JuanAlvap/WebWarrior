@@ -7,14 +7,17 @@ public class WebWarriors {
   private PApplet app;
   private List platforms;
   private List battleList; // Lista de batallas
+  private List spikes;
   private int activeBattleIndex = 0; // Índice de la batalla activa
   private boolean battleState = false; // Controla si una batalla está en curso
+  private boolean count = true;
 
   public WebWarriors(PApplet app) {
     this.app = app;
     this.playlist = new CircularDoublyList();
     this.platforms = new SimpleList();
     this.battleList = new SimpleList();
+    this.spikes = new SimpleList();
 
   }
   
@@ -35,32 +38,43 @@ public class WebWarriors {
     this.battleList.addNode(battle);
   }
 
-  public void startBattle() {
+  public void startBattle(int life) {
     if (((SimpleList)battleList).size() > 0) {
       Battle battle = (Battle) ((SimpleList)battleList).getNode(activeBattleIndex);
       battleState = true;
-      battle.start(); 
+      battle.start(life); 
     }
   }
 
-  public void nextBattle() {
+  public void nextBattle(int life) {
     if (activeBattleIndex < ((SimpleList)battleList).size() - 1) {
       activeBattleIndex++;
-      startBattle();
+      startBattle(life);
     }
   }
 
-  public void updateBattle() {
+  public int updateBattle(int life) {
+    Battle battle = (Battle) ((SimpleList)battleList).getNode(activeBattleIndex);
     if (battleState && ((SimpleList)battleList).size() > 0) {
-      Battle battle = (Battle) ((SimpleList)battleList).getNode(activeBattleIndex);
       app.image(combate, 0, 0);
+      if(count){
+        //se pasa la información de la vida en el juego
+        battle.setPlayerHealth(life);
+        count = false;
+      }
+      
+      battle.updatePlayerLifeBar(app);
+      battle.updateEnemyLifeBar(app);
       battle.displayStatus();
       battle.displaySquares();
       battle.displayTurn();
       if(battle.getEnemyHealth() == 0 || battle.getPlayerHealth() == 0){
         battleState = false;
+        count = true;
       }
     }
+    //se pasa la información de la vida después de la batalla
+    return battle.getPlayerHealth();
   }
 
   public void mousePressed() {
@@ -88,6 +102,14 @@ public class WebWarriors {
   
   public List getPlatforms(){
     return this.platforms;
+  }
+  
+  public void addSpike(Object spike){
+    this.spikes.addNode(spike);
+  }
+  
+  public List getSpikes(){
+    return this.spikes;
   }
 
   private void setupPlaylist() {

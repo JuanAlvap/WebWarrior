@@ -1,8 +1,10 @@
 class Platform{
   private float x, y;
   private float width, height; 
+  private int index;
   
-  public Platform(float x, float y, float width, float height) {
+  public Platform(int index, float x, float y, float width, float height) {
+    this.index = index;
     this.x = x;
     this.y = y;
     this.width = width;
@@ -20,6 +22,9 @@ class Platform{
   }
   public float getY(){
     return this.y;
+  }
+  public float getIndex(){
+    return this.index;
   }
   public float getHeight(){
     return this.height;
