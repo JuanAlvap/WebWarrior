@@ -1,56 +1,63 @@
 //La clase del cronómetro
 class Timer {
-  int startTime = 0, pauseTime = 0, totalPausedTime = 0;
-  boolean running = false;
-  boolean paused = false;
-
+  private int startTime, pauseTime, totalPausedTime;
+  private boolean running;
+  private boolean paused;
+  
+  public Timer(){
+    this.startTime = 0;
+    this.pauseTime = 0;
+    this.totalPausedTime = 0;
+    this.running = false;
+    this.paused = false;
+  }
   //Inicia el cronómetro
   //Todo el cronómetro fue hecho con la función millis() la cual arroja el tiempo em milisegundos
-  void start() {
-    if (!running) {
-      startTime = millis() - totalPausedTime;
-      running = true;
-      paused = false;
+  public void start() {
+    if (!this.running) {
+      this.startTime = millis() - this.totalPausedTime;
+      this.running = true;
+      this.paused = false;
     }
   }
 
-  void stop() {
-    running = false;
-    paused = false;
+  public void stop() {
+    this.running = false;
+    this.paused = false;
   }
 
   //"Pausa" el tiempo
-  void pause() {
-    if (running && !paused) {
-      pauseTime = millis();
-      paused = true;
+  public void pause() {
+    if (this.running && !this.paused) {
+      this.pauseTime = millis();
+      this.paused = true;
     }
   }
 
   //Resume el tiempo pausado anteriormente
-  void resume() {
-    if (running && paused) {
-      totalPausedTime += millis() - pauseTime;
-      paused = false;
+  public void resume() {
+    if (this.running && this.paused) {
+      this.totalPausedTime += millis() - this.pauseTime;
+      this.paused = false;
     }
   }
 
   //Si se llama a esta función se reinicia el tiempo
-  void restart() {
-    startTime = millis();
-    totalPausedTime = 0;
-    running = true;
-    paused = false;
+  public void restart() {
+    this.startTime = millis();
+    this.totalPausedTime = 0;
+    this.running = true;
+    this.paused = false;
   }
 
   //Tiempo total trasncurrido
-  int getElapsedTime() {
+  public int getElapsedTime() {
     int elapsed;
-    if (running) {
-      if (paused) {
-        elapsed = pauseTime - startTime - totalPausedTime;
+    if (this.running) {
+      if (this.paused) {
+        elapsed = this.pauseTime - this.startTime - this.totalPausedTime;
       } else {
-        elapsed = millis() - startTime - totalPausedTime;
+        elapsed = millis() - this.startTime - this.totalPausedTime;
       }
     } else {
       elapsed = 0;
@@ -59,29 +66,40 @@ class Timer {
   }
 
   //Estas funciones devuelven el tiempo transcurrido en milisegundos, segundos y minutos
-  int milisecond() {
+  public int milisecond() {
     return (getElapsedTime() / 10) % 100;
   }
 
-  int second() {
+  public int second() {
     return (getElapsedTime() / 1000) % 60;
   }
 
-  int minute() {
+  public int minute() {
     return (getElapsedTime() / (1000 * 60)) % 60;
   }
 
 
   //Muestra en pantalla el cronómetro
-  void time() {
+  public void time() {
     fill(255);
     //NF CONVIERTE NÚMEROS A STRING AÑADIENDO 0 A LA IZQUIERDA, POR ESO SE PONE COMO PARÁMETRO 2 PARA QUE SOLO MUESTRE 2 DÍGITOS
     textSize(40);
     text(nf(this.minute(), 2)+":"+nf(this.second(), 2)+":"+nf(this.milisecond(), 2), 600, 100);
   
-    //Cuando llegue a 100 segundos muera el personaje
-    if (this.minute() == 1 && this.second() >= 40 ) {
-      print("you died");
+    if (this.second() >= 50) {
+      screen = 0;
+      mainCharacter.getGifPlayer().setX(0);
+      mainCharacter.getGifPlayer().setY(0);
+      mainCharacter.setLife(10);
+      backgroundOffset = 0;
+      this.restart();
+      battleFinished = true;
+      booleanBattle1 = false;
+      booleanBattle2 = false;
+      booleanBattle3 = false;
+      map1 = false;
+      map2 = false;
+      map3 = false;
     }
   }
 }

@@ -9,14 +9,14 @@ public class CircularSimpleList extends List {
   @Override
   public void addNode(Object info) {
     Node newNode = new SimpleNode(info);
-    if (PTR == null) {  // Si la lista está vacía
-      PTR = newNode;
-      FINAL = newNode;
-      FINAL.next = PTR;  // El siguiente del último nodo apunta al primer nodo
+    if (this.PTR == null) {  // Si la lista está vacía
+      this.PTR = newNode;
+      this.FINAL = newNode;
+      this.FINAL.setNext(this.PTR);  // El siguiente del último nodo apunta al primer nodo
     } else {
-      FINAL.next = newNode;  // El último nodo apunta al nuevo nodo
-      newNode.next = PTR;    // El nuevo nodo apunta al primer nodo
-      FINAL = newNode;       // Actualiza el puntero al último nodo
+      this.FINAL.setNext(newNode);  // El último nodo apunta al nuevo nodo
+      newNode.setNext(this.PTR);    // El nuevo nodo apunta al primer nodo
+      this.FINAL = newNode;       // Actualiza el puntero al último nodo
     }
   }
 }

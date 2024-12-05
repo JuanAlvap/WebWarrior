@@ -25,7 +25,7 @@ public class GifPlayer {
     this.speed = 5;
   
     // Cargar los cuadros en la lista de frames
-    for (int i = 0; i < numFrames; i++) {
+    for (int i = 0; i < this.numFrames; i++) {
         String filename = folder + i + ".png";
         PImage frame = app.loadImage(filename);
         //frame.resize((int) width, (int) height);
@@ -35,35 +35,31 @@ public class GifPlayer {
   
   // Método para mostrar el GIF en la screen
   public void display(PApplet app) {
-      /*app.noFill();
-      app.stroke(255, 0, 0);  // Dibujar el marco de colisión
-      app.rect(x, y, width, height);*/
-  
-      if (numFrames > 0) {
-          PImage currentFrame = (PImage) frames.getNode(frameIndex);
-          app.image(currentFrame, x, y, width, height);
+      if (this.numFrames > 0) {
+          PImage currentFrame = (PImage) this.frames.getNode(this.frameIndex);
+          app.image(currentFrame, this.x, this.y, width, height);
       }
   
       // Lógica de avance de cuadros
-      delayCounter++;
-      if (delayCounter >= frameDelay) {
-          frameIndex = (frameIndex + 1) % numFrames;  // Avanzar al siguiente cuadro
-          delayCounter = 0;  // Reiniciar contador
+      this.delayCounter++;
+      if (this.delayCounter >= this.frameDelay) {
+          this.frameIndex = (this.frameIndex + 1) % this.numFrames;  // Avanzar al siguiente cuadro
+          this.delayCounter = 0;  // Reiniciar contador
       }
   }
   
   public void enemyDisplay(PApplet app, int xpos, int ypos){
 
-      if (numFrames > 0) {
-          PImage currentFrame = (PImage) frames.getNode(frameIndex);
+      if (this.numFrames > 0) {
+          PImage currentFrame = (PImage) this.frames.getNode(this.frameIndex);
           app.image(currentFrame, xpos - backgroundOffset, ypos, width, height);
       }
   
       // Lógica de avance de cuadros
-      delayCounter++;
-      if (delayCounter >= frameDelay) {
-          frameIndex = (frameIndex + 1) % numFrames;  // Avanzar al siguiente cuadro
-          delayCounter = 0;  // Reiniciar contador
+      this.delayCounter++;
+      if (this.delayCounter >= this.frameDelay) {
+          this.frameIndex = (this.frameIndex + 1) % this.numFrames;  // Avanzar al siguiente cuadro
+          this.delayCounter = 0;  // Reiniciar contador
       }
   }
   

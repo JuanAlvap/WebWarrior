@@ -28,14 +28,7 @@ public class Battle {
     private boolean showStartImage; // Indica si se debe mostrar la imagen inicial
 
     // Daño que los botones causan en cada ronda
-    private int[][] damageMatrix = {
-        {2, 3, 4, 0}, // Daños para ronda 1
-        {1, 4, 3, 0}, // Daños para ronda 2
-        {3, 0, 1, 4}, // Daños para ronda 3
-        {4, 1, 2, 3}, // Daños para ronda 4
-        {2, 3, 4, 0}, // Daños para ronda 5
-        {3, 4, 1, 0}  // Daños para ronda 6
-    };
+    private int[][] damageMatrix;
     
     private int currentCommentIndex; // Índice del comentario actual
     private int letterCount;         // Contador de letras mostradas
@@ -45,10 +38,16 @@ public class Battle {
     private Character battleCharacter;
     private Character enemy;
     
+    private Movie youWon;
+    private Movie youLose;
+    
     private WebWarriors game; // Referencia a WebWarriors
 
-    public Battle(PApplet app, SimpleList textsRound0, SimpleList textsRound1, SimpleList textsRound2, SimpleList textsRound3, SimpleList textsRound4, SimpleList textsRound5, SimpleList xPositions, SimpleList yPositions, WebWarriors game, SimpleList comments, Character battleCharacter, Character enemy) {
+    public Battle(PApplet app, int[][] damageMatrix, Movie youWon, Movie youLose, SimpleList textsRound0, SimpleList textsRound1, SimpleList textsRound2, SimpleList textsRound3, SimpleList textsRound4, SimpleList textsRound5, SimpleList xPositions, SimpleList yPositions, WebWarriors game, SimpleList comments, Character battleCharacter, Character enemy) {
         this.app = app;
+        this.damageMatrix = damageMatrix;
+        this.youWon = youWon;
+        this.youLose = youLose;
         this.textsRound0 = textsRound0;
         this.textsRound1 = textsRound1;
         this.textsRound2 = textsRound2;
@@ -72,227 +71,227 @@ public class Battle {
     }
 
     public void start(int life) {
-        isPlayerTurn = true;
-        inBattle = true;
-        playerHealth = life;
-        enemyHealth = 10;
-        selectedAction = 0; // Resetear la acción seleccionada al inicio de cada batalla
-        round = 0; // Resetear las rondas
-        damageMessage = ""; // Resetear mensaje de daño
-        enemyDamageMessage = ""; // Resetear mensaje de daño del enemigo
-        printNext = false;
-        startBattleStartTime = app.millis(); // Guardar el tiempo de inicio
-        showStartImage = true; // Activar la visualización de la imagen inicial
+        this.isPlayerTurn = true;
+        this.inBattle = true;
+        this.playerHealth = life;
+        this.enemyHealth = 10;
+        this.selectedAction = 0; // Resetear la acción seleccionada al inicio de cada batalla
+        this.round = 0; // Resetear las rondas
+        this.damageMessage = ""; // Resetear mensaje de daño
+        this.enemyDamageMessage = ""; // Resetear mensaje de daño del enemigo
+        this.printNext = false;
+        this.startBattleStartTime = app.millis(); // Guardar el tiempo de inicio
+        this.showStartImage = true; // Activar la visualización de la imagen inicial
+        this.currentCommentIndex = 0;
         areYouReady.play();
     }
 
     public void displayStatus() {
         app.fill(0);
-        app.text("Player    " + playerHealth + "/10", 1140, 400);
-        app.text(enemyHealth + "/10" + "    Enemy", 100, 120);
+        app.text("Player    " + this.playerHealth + "/10", 1140, 400);
+        app.text(this.enemyHealth + "/10" + "    Enemy", 100, 120);
     }
 
     public void displaySquares() {
-        if (inBattle) {
-            Node textNodeRound0 = textsRound0.PTR;  // Recorrer la lista de textos
-            Node textNodeRound1 = textsRound1.PTR;
-            Node textNodeRound2 = textsRound2.PTR;  // Recorrer la lista de textos
-            Node textNodeRound3 = textsRound3.PTR;
-            Node textNodeRound4 = textsRound4.PTR;  // Recorrer la lista de textos
-            Node textNodeRound5 = textsRound5.PTR;
-            Node xNode = squareX.PTR;         // Recorrer la lista de posiciones X
-            Node yNode = squareY.PTR;         // Recorrer la lista de posiciones Y
+        if (this.inBattle) {
+            Node textNodeRound0 = this.textsRound0.getPTR();  // Recorrer la lista de textos
+            Node textNodeRound1 = this.textsRound1.getPTR();
+            Node textNodeRound2 = this.textsRound2.getPTR();  // Recorrer la lista de textos
+            Node textNodeRound3 = this.textsRound3.getPTR();
+            Node textNodeRound4 = this.textsRound4.getPTR();  // Recorrer la lista de textos
+            Node textNodeRound5 = this.textsRound5.getPTR();
+            Node xNode = this.squareX.getPTR();         // Recorrer la lista de posiciones X
+            Node yNode = this.squareY.getPTR();         // Recorrer la lista de posiciones Y
             int pos = 0;
             while (textNodeRound0 != null && textNodeRound1 != null && textNodeRound2 != null && textNodeRound3 != null && textNodeRound4 != null && textNodeRound5 != null) {
                 pos++;
                 app.fill(255);
                 if (pos == 5) {
-                    app.image(optionBox, (Integer) xNode.info, (Integer) yNode.info, squareSize + 350, squareSize + 80);
+                    app.image(optionBox, (Integer) xNode.getInfo(), (Integer) yNode.getInfo(), this.squareSize + 350, this.squareSize + 80);
                 } else {
-                    app.image(optionBox, (Integer) xNode.info, (Integer) yNode.info, squareSize + 350, squareSize);
+                    app.image(optionBox, (Integer) xNode.getInfo(), (Integer) yNode.getInfo(), this.squareSize + 350, this.squareSize);
                 }
 
                 app.fill(0); // Color de texto blanco
                 
                 if (round == 0) {
-                    app.text((String) textNodeRound0.info, (Integer) xNode.info + squareSize / 2, (Integer) yNode.info + squareSize / 2 - 10);
+                    app.text((String) textNodeRound0.getInfo(), (Integer) xNode.getInfo() + this.squareSize / 2, (Integer) yNode.getInfo() + this.squareSize / 2 - 10);
                 }
                 if (round == 1) {
-                    app.text((String) textNodeRound1.info, (Integer) xNode.info + squareSize / 2, (Integer) yNode.info + squareSize / 2 - 10);
+                    app.text((String) textNodeRound1.getInfo(), (Integer) xNode.getInfo() + this.squareSize / 2, (Integer) yNode.getInfo() + this.squareSize / 2 - 10);
                 }
                 if (round == 2) {
-                    app.text((String) textNodeRound2.info, (Integer) xNode.info + squareSize / 2, (Integer) yNode.info + squareSize / 2 - 10);
+                    app.text((String) textNodeRound2.getInfo(), (Integer) xNode.getInfo() + this.squareSize / 2, (Integer) yNode.getInfo() + this.squareSize / 2 - 10);
                 }
                 if (round == 3) {
-                    app.text((String) textNodeRound3.info, (Integer) xNode.info + squareSize / 2, (Integer) yNode.info + squareSize / 2 - 10);
+                    app.text((String) textNodeRound3.getInfo(), (Integer) xNode.getInfo() + this.squareSize / 2, (Integer) yNode.getInfo() + this.squareSize / 2 - 10);
                 }
                 if (round == 4) {
-                    app.text((String) textNodeRound4.info, (Integer) xNode.info + squareSize / 2, (Integer) yNode.info + squareSize / 2 - 10);
+                    app.text((String) textNodeRound4.getInfo(), (Integer) xNode.getInfo() + this.squareSize / 2, (Integer) yNode.getInfo() + this.squareSize / 2 - 10);
                 }
                 if (round == 5) {
-                    app.text((String) textNodeRound5.info, (Integer) xNode.info + squareSize / 2, (Integer) yNode.info + squareSize / 2 - 10);
+                    app.text((String) textNodeRound5.getInfo(), (Integer) xNode.getInfo() + this.squareSize / 2, (Integer) yNode.getInfo() + this.squareSize / 2 - 10);
                 }
                 
-                textNodeRound0 = textNodeRound0.next;
-                textNodeRound1 = textNodeRound1.next;
-                textNodeRound2 = textNodeRound2.next;
-                textNodeRound3 = textNodeRound3.next;
-                textNodeRound4 = textNodeRound4.next;
-                textNodeRound5 = textNodeRound5.next;
-                xNode = xNode.next;
-                yNode = yNode.next;
+                textNodeRound0 = textNodeRound0.getNext();
+                textNodeRound1 = textNodeRound1.getNext();
+                textNodeRound2 = textNodeRound2.getNext();
+                textNodeRound3 = textNodeRound3.getNext();
+                textNodeRound4 = textNodeRound4.getNext();
+                textNodeRound5 = textNodeRound5.getNext();
+                xNode = xNode.getNext();
+                yNode = yNode.getNext();
             }
         }
     }
 
     public void playerAction() {
-        if (isPlayerTurn && inBattle) {
+        if (this.isPlayerTurn && this.inBattle) {
             // Obtener el daño que corresponde a la ronda y al botón presionado
-            int damage = damageMatrix[round][selectedAction - 1]; // Restar 1 porque las acciones están indexadas desde 0
+            int damage = this.damageMatrix[this.round][this.selectedAction - 1]; // Restar 1 porque las acciones están indexadas desde 0
 
             // Reducir la salud del enemigo
-            enemyHealth -= damage;
+            this.enemyHealth -= damage;
+            game.playCharacterAttackSound();
             if(damage != 0){
-              battleCharacter.vibrate();
+              this.battleCharacter.vibrate();
             }
             // Mensaje de daño
             switch (damage){
                 case 0:
-                  damageMessage = "That wasn't a good choice. You caused no harm to the enemy.\nTry harder next time!";
+                  this.damageMessage = "That wasn't a good choice. You caused no harm to the enemy.\nTry harder next time!";
                   break;
                 case 1:
-                  damageMessage = "A small hit, but it barely scratched the enemy.\nThink carefully to deal more damage!";
+                  this.damageMessage = "A small hit, but it barely scratched the enemy.\nThink carefully to deal more damage!";
                   break;
                 case 2:
-                  damageMessage = "Not bad! You managed to weaken the enemy a little.\nStay sharp for better results!";
+                  this.damageMessage = "Not bad! You managed to weaken the enemy a little.\nStay sharp for better results!";
                   break;
                 case 3:
-                  damageMessage = "Great choice! You struck the enemy hard.\nKeep it up and aim for the perfect answer!";
+                  this.damageMessage = "Great choice! You struck the enemy hard.\nKeep it up and aim for the perfect answer!";
                   break;
                 case 4:
-                  damageMessage = "Excellent decision! A critical blow to the enemy!\nYou're getting closer to victory!";
+                  this.damageMessage = "Excellent decision! A critical blow to the enemy!\nYou're getting closer to victory!";
                   break;
                 default:
-                  damageMessage = "You dealt " + damage + " damage to the enemy!";
+                  this.damageMessage = "You dealt " + damage + " damage to the enemy!";
                   break;
             }
             
-            enemyDamageMessage = "";
-            if (enemyHealth <= 0) {
-                System.out.print("you won");
+            this.enemyDamageMessage = "";
+            if (this.enemyHealth <= 0) {
                 showYouWon = true;
-                youWon1.play();
+                this.youWon.play();
                 startTime = millis();
-                inBattle = false; // Terminar la batalla si el enemigo muere
+                this.inBattle = false; // Terminar la batalla si el enemigo muere
                 game.setBattleState(false); // Actualizar battleState en WebWarriors
             } else {
-                isPlayerTurn = false;
-                enemyTurnStartTime = millis(); // Marcar el inicio del turno enemigo
+                this.isPlayerTurn = false;
+                this.enemyTurnStartTime = millis(); // Marcar el inicio del turno enemigo
             }
         }
     }
 
     public void enemyAction() {
-        if (!isPlayerTurn && inBattle) {
+        if (!this.isPlayerTurn && this.inBattle) {
             
           // El enemigo hace un ataque
           int enemyDamage = (int) random(1, 5); // Daño aleatorio del enemigo
-          playerHealth -= enemyDamage;
+          game.playVirusAttackSound(); // corregir !!!!! !!!!! !!!!! !!!!! !!!!! !!!!! !!!!! !!!!! !!!!! !!!!! !!!!! !!!!! !!!!! !!!!! !!!!! !!!!! !!!!! !!!!!
+          this.playerHealth -= enemyDamage;
           // Mensaje de daño
           switch (enemyDamage){
               case 1:
-                enemyDamageMessage = "Is that all you've got?\nYou're barely holding up!";
+                this.enemyDamageMessage = "Is that all you've got?\nYou're barely holding up!";
                 break;
               case 2:
-                enemyDamageMessage = "I can see you're struggling.\nMy attacks are starting to wear you down!";
+                this.enemyDamageMessage = "I can see you're struggling.\nMy attacks are starting to wear you down!";
                 break;
               case 3:
-                enemyDamageMessage = "You're feeling it now, aren't you?\nI'm just getting started!";
+                this.enemyDamageMessage = "You're feeling it now, aren't you?\nI'm just getting started!";
                 break;
               case 4:
-                enemyDamageMessage = "Your defenses are crumbling!\nYou can't keep this up much longer!";
+                this.enemyDamageMessage = "Your defenses are crumbling!\nYou can't keep this up much longer!";
                 break;
               case 5:
-                enemyDamageMessage = "A crushing blow!\nYou'll never recover from this!";
+                this.enemyDamageMessage = "A crushing blow!\nYou'll never recover from this!";
                 break;
               default:
-                enemyDamageMessage = "The enemy dealt " + enemyDamage + " damage to the you!";
+                this.enemyDamageMessage = "The enemy dealt " + enemyDamage + " damage to the you!";
                 break;
           }
           // Verificar si la batalla ha terminado
-          selectedAction = 0; // Resetear la acción seleccionada
-          round++; // Incrementar la ronda
-          damageMessage = "";
-          enemy.vibrate();
+          this.selectedAction = 0; // Resetear la acción seleccionada
+          this.round++; // Incrementar la ronda
+          this.damageMessage = "";
+          this.enemy.vibrate();
           // Cambiar al siguiente comentario cuando cambia de ronda
-          currentCommentIndex = (currentCommentIndex + 1) % comments.size();
-          letterCount = 0;  // Reinicia el conteo de letras para el nuevo mensaje
+          this.currentCommentIndex = (this.currentCommentIndex + 1) % this.comments.size();
+          this.letterCount = 0;  // Reinicia el conteo de letras para el nuevo mensaje
           
-          if (playerHealth <= 0) {
+          if (this.playerHealth <= 0) {
             //se devuelve la vida a 0 porque si es negativa no se puede dibujar en la barra de vida.
               this.playerHealth = 0;
-              System.out.print("you lose");
               showYouLose = true;
-              youLose1.play();
+              this.youLose.play();
               startTime = millis();
-              inBattle = false; // Terminar la batalla si el jugador muere
+              this.inBattle = false; // Terminar la batalla si el jugador muere
               game.setBattleState(false); // Actualizar battleState en WebWarriors
           } 
         }
     }
 
     public void displayTurn() {
-        if (inBattle) {
-            if (showStartImage) {
+        if (this.inBattle) {
+            if (this.showStartImage) {
                 // Mostrar la imagen inicial durante 5 segundos
                 app.image(areYouReady, 0, 0, app.width, app.height); // Ajusta la imagen al tamaño de la pantalla
-                if (app.millis() - startBattleStartTime > 6000) {
+                if (app.millis() - this.startBattleStartTime > 6000) {
                     areYouReady.stop();
-                    showStartImage = false; // Desactivar la imagen inicial después de 5 segundos
+                    this.showStartImage = false; // Desactivar la imagen inicial después de 5 segundos
                 }
             } else {
                 // Aquí continúa la lógica normal de la batalla
-                
-                battleCharacter.display(app);
-                enemy.display(app);
-                if (isPlayerTurn) {
+                this.battleCharacter.display(app);
+                this.enemy.display(app);
+                if (this.isPlayerTurn) {
                     app.fill(0);
                     app.text("Your turn.\nChoose an action.", 80, 590);
                     app.image(textBox, 550, 50, 450, 250);
-                    Object comment = comments.getNode(currentCommentIndex);
+                    Object comment = this.comments.getNode(this.currentCommentIndex);
                     if (comment != null) {
                         String currentComment = (String) comment;
     
                         // Control de tiempo para mostrar letra por letra
-                        if (app.millis() - lastUpdate > displaySpeed) {
-                            if (letterCount < currentComment.length()) {
-                                letterCount++;
+                        if (app.millis() - this.lastUpdate > this.displaySpeed) {
+                            if (this.letterCount < currentComment.length()) {
+                                this.letterCount++;
                             }
-                            lastUpdate = app.millis();
+                            this.lastUpdate = app.millis();
                         }
     
                         // Mostrar las letras hasta `letterCount`
                         app.fill(0);
-                        app.text(currentComment.substring(0, letterCount), 580, 100);
+                        app.text(currentComment.substring(0, this.letterCount), 580, 100);
                     }
                 } else {
                     app.fill(0);
                     app.rect(37, 530, 1440, 183);
                     app.fill(255);
                     // Mostrar el mensaje de daño después del turno del jugador
-                    app.text(damageMessage, 72, 610);
-                    if (app.millis() - enemyTurnStartTime >= 5000 && printNext == false) {
+                    app.text(this.damageMessage, 72, 610);
+                    if (app.millis() - this.enemyTurnStartTime >= 5000 && this.printNext == false) {
                         enemyAction();
-                        enemyTurnStartTime = app.millis();
-                        printNext = true;
-                    } else if (app.millis() - enemyTurnStartTime <= Integer.MAX_VALUE) {
-                        app.text(enemyDamageMessage, 72, 610);
+                        this.enemyTurnStartTime = app.millis();
+                        this.printNext = true;
+                    } else if (app.millis() - this.enemyTurnStartTime <= Integer.MAX_VALUE) {
+                        app.text(this.enemyDamageMessage, 72, 610);
                         app.fill(255);
-                        if (printNext) {
+                        if (this.printNext) {
                             app.image(next, 1200, 570, 100, 100);
                         }
-                    } else if (playerHealth <= 0 || enemyHealth <= 0) {
-                        inBattle = false;
+                    } else if (this.playerHealth <= 0 || this.enemyHealth <= 0) {
+                        this.inBattle = false;
                         game.setBattleState(false); // Actualizar battleState en WebWarriors
                     }
                 }
@@ -337,6 +336,10 @@ public class Battle {
               app.image(lifeBar0, 50, 140);
               break;
         }
+    }
+    
+    public void setBattleCharacter(Character battleCharacter){
+      this.battleCharacter = battleCharacter;
     }
     
     public void updatePlayerLifeBar(PApplet app) {
@@ -385,7 +388,32 @@ public class Battle {
             this.playerHealth = newLife; // Actualizar la vida
         }
     }
-  
+    
+    public void mousePressed() {
+        if (this.isPlayerTurn && this.inBattle) {
+            // Aquí comprobamos si el jugador presionó alguno de los botones y asignamos la acción correspondiente
+            if (app.mouseX >= 545 && app.mouseX <= 545 + this.squareSize + 350 && app.mouseY >= 537 && app.mouseY <= 537 + this.squareSize) {
+                this.selectedAction = 1;
+                playerAction();
+            } else if (app.mouseX >= 1000 && app.mouseX <= 1000 + this.squareSize + 350 && app.mouseY >= 537 && app.mouseY <= 537 + this.squareSize) {
+                this.selectedAction = 2;
+                playerAction();
+            } else if (app.mouseX >= 545 && app.mouseX <= 545 + this.squareSize + 350 && app.mouseY >= 630 && app.mouseY <= 630 + this.squareSize) {
+                this.selectedAction = 3;
+                playerAction();
+            } else if (app.mouseX >= 1000 && app.mouseX <= 1000 + this.squareSize + 350 && app.mouseY >= 630 && app.mouseY <= 630 + this.squareSize) {
+                this.selectedAction = 4;
+                playerAction();
+            }
+        }else if(!this.isPlayerTurn && this.inBattle && this.printNext == true){
+          if (app.mouseX >= 1200 && app.mouseX <= 1200 + 100 && app.mouseY >= 550 && app.mouseY <= 550 + 100) {
+             this.isPlayerTurn = true;
+             this.printNext = false;
+          }
+        }
+    }
+    
+    //GETTERS Y SETTERS
     
     public boolean isInBattle() {
         return inBattle;
@@ -398,31 +426,8 @@ public class Battle {
     public int getEnemyHealth(){
       return this.enemyHealth;
     }
+    
     public int getPlayerHealth(){
       return this.playerHealth;
-    }
-    
-    public void mousePressed() {
-        if (isPlayerTurn && inBattle) {
-            // Aquí comprobamos si el jugador presionó alguno de los botones y asignamos la acción correspondiente
-            if (app.mouseX >= 545 && app.mouseX <= 545 + squareSize + 350 && app.mouseY >= 537 && app.mouseY <= 537 + squareSize) {
-                selectedAction = 1;
-                playerAction();
-            } else if (app.mouseX >= 1000 && app.mouseX <= 1000 + squareSize + 350 && app.mouseY >= 537 && app.mouseY <= 537 + squareSize) {
-                selectedAction = 2;
-                playerAction();
-            } else if (app.mouseX >= 545 && app.mouseX <= 545 + squareSize + 350 && app.mouseY >= 630 && app.mouseY <= 630 + squareSize) {
-                selectedAction = 3;
-                playerAction();
-            } else if (app.mouseX >= 1000 && app.mouseX <= 1000 + squareSize + 350 && app.mouseY >= 630 && app.mouseY <= 630 + squareSize) {
-                selectedAction = 4;
-                playerAction();
-            }
-        }else if(!isPlayerTurn && inBattle && printNext == true){
-          if (app.mouseX >= 1200 && app.mouseX <= 1200 + 100 && app.mouseY >= 550 && app.mouseY <= 550 + 100) {
-             isPlayerTurn = true;
-             printNext = false;
-          }
-        }
     }
 }

@@ -8,4 +8,8 @@ public abstract class List {
   }
   
   protected abstract void addNode(Object info);
+  
+  public Node getPTR(){
+    return this.PTR;
+  }
 }

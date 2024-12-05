@@ -5,38 +5,37 @@ public class Character {
   private float velocityY;
   private float velocityX; // Nueva variable para la velocidad en X
   private boolean onGround;
-  private final float gravity = 0.5; // Fuerza de la gravedad
-  private final float jumpStrength = -12; // Fuerza del salto
+  private final float gravity; // Fuerza de la gravedad
+  private final float jumpStrength; // Fuerza del salto
 
   private boolean isInvulnerable; 
   private int invulnerabilityTimer; 
-  private final int invulnerabilityDuration = 100; 
+  private final int invulnerabilityDuration; 
   private int blinkTimer; 
   
   private boolean isJumping; 
   private int jumpTime; 
-  private final int maxJumpTime = 9; 
+  private final int maxJumpTime; 
   
   // Variables de movimiento
   private boolean moveUp;
-  private boolean moveDown;
   private boolean moveLeft;
   private boolean moveRight;
   
   private int life;
-  private int blinkCount = 0;  // Contador para controlar el parpadeo
-  private boolean showFirstImage = true; // Estado actual: ¿mostrar img1 o img2?
-  private int blinkDuration = 60; // Duración total del parpadeo en fotogramas
-  private int blinkRate = 10; // Tasa de parpadeo (en fotogramas)
-  private boolean isBlinking = false; // Estado del parpadeo
+  private int blinkCount;  // Contador para controlar el parpadeo
+  private boolean showFirstImage; // Estado actual: ¿mostrar img1 o img2?
+  private int blinkDuration; // Duración total del parpadeo en fotogramas
+  private int blinkRate; // Tasa de parpadeo (en fotogramas)
+  private boolean isBlinking; // Estado del parpadeo
   private PImage currentLifeBar; // Barra de vida actual
   private PImage previousLifeBar; // Barra de vida anterior
   
-  private boolean isVibrating = false; // Estado de la vibración
-  private float vibrationAmplitude = 20; // Amplitud del movimiento
-  private float vibrationDuration = 1.0f; // Duración total de la vibración en segundos
-  private float vibrationElapsedTime = 0; // Tiempo acumulado de vibración
-  private float vibrationFrequency = 3; // Frecuencia de vibración (ciclos por segundo)
+  private boolean isVibrating; // Estado de la vibración
+  private float vibrationAmplitude; // Amplitud del movimiento
+  private float vibrationDuration; // Duración total de la vibración en segundos
+  private float vibrationElapsedTime; // Tiempo acumulado de vibración
+  private float vibrationFrequency; // Frecuencia de vibración (ciclos por segundo)
   private float originalX; // Posición X inicial para restaurar después de la vibración
   
   public Character(PApplet app, String folder, int numFrames, float x, float y, float speed, float width, float height) {
@@ -44,7 +43,6 @@ public class Character {
       this.gifPlayer = new GifPlayer(app, folder, numFrames, x, y, width,height);
       this.speed = speed;
       this.moveUp = false;
-      this.moveDown = false;
       this.moveLeft = false;
       this.moveRight = false;
       this.velocityY = 0;
@@ -54,117 +52,127 @@ public class Character {
       this.invulnerabilityTimer = 0;
       this.blinkTimer = 0;
       this.life = 10;
+      this.gravity = 0.5;
+      this.jumpStrength = -12;
+      this.invulnerabilityDuration = 100;
+      this.maxJumpTime = 9;
+      this.showFirstImage = true;
+      this.isBlinking = false;
+      this.blinkCount = 0;
+      this.blinkDuration = 60;
+      this.blinkRate = 10;
+      this.isVibrating = false;
+      this.vibrationAmplitude = 20;
+      this.vibrationDuration = 1.0f;
+      this.vibrationElapsedTime = 0;
+      this.vibrationFrequency = 3;
   }
 
   // Método para iniciar la vibración
   public void vibrate() {
-      if (!isVibrating) {
-          isVibrating = true;
-          vibrationElapsedTime = 0; // Reiniciar el tiempo acumulado
-          originalX = gifPlayer.getX(); // Guardar la posición original
+      if (!this.isVibrating) {
+          this.isVibrating = true;
+          this.vibrationElapsedTime = 0; // Reiniciar el tiempo acumulado
+          this.originalX = this.gifPlayer.getX(); // Guardar la posición original
       }
   }
   
   // Método para actualizar la vibración (llamar dentro de `move` o `display`)
   private void updateVibration(PApplet app) {
-      if (isVibrating) {
+      if (this.isVibrating) {
           // Incrementa el tiempo acumulado
-          vibrationElapsedTime += 1.0 / app.frameRate;
+          this.vibrationElapsedTime += 1.0 / app.frameRate;
   
           // Calcula el desplazamiento sinusoidal
-          float offsetX = (float) Math.sin(vibrationElapsedTime * vibrationFrequency * PConstants.TWO_PI) * vibrationAmplitude;
+          float offsetX = (float) Math.sin(this.vibrationElapsedTime * this.vibrationFrequency * PConstants.TWO_PI) * this.vibrationAmplitude;
   
           // Ajusta la posición temporal del personaje
-          gifPlayer.setX(originalX + offsetX);
+          this.gifPlayer.setX(this.originalX + offsetX);
   
           // Detén la vibración al finalizar la duración
-          if (vibrationElapsedTime >= vibrationDuration) {
-              gifPlayer.setX(originalX); // Restaurar la posición original
-              isVibrating = false;
+          if (this.vibrationElapsedTime >= this.vibrationDuration) {
+              this.gifPlayer.setX(this.originalX); // Restaurar la posición original
+              this.isVibrating = false;
           }
       }
   }
   
   //INVULNERABILIDAD
   public void updateInvulnerability() {
-    if (isInvulnerable) {
-      invulnerabilityTimer++;
-      blinkTimer++;
+    if (this.isInvulnerable) {
+      this.invulnerabilityTimer++;
+      this.blinkTimer++;
 
       // Finalizar el periodo de inmunidad
-      if (invulnerabilityTimer > invulnerabilityDuration) {
-          isInvulnerable = false;
-          invulnerabilityTimer = 0;
+      if (this.invulnerabilityTimer > this.invulnerabilityDuration) {
+          this.isInvulnerable = false;
+          this.invulnerabilityTimer = 0;
       }
     }
   }
   
   // Método para controlar el movimiento
   public void move(PApplet app, int index) {
-      if (moveLeft) {
-        velocityX = -speed; // Movimiento hacia la izquierda
-      } else if (moveRight) {
-          velocityX = speed; // Movimiento hacia la derecha
+      if (this.moveLeft) {
+        this.velocityX = -this.speed; // Movimiento hacia la izquierda
+      } else if (this.moveRight) {
+          this.velocityX = this.speed; // Movimiento hacia la derecha
       } else {
-          velocityX = 0; // Detener el movimiento horizontal
+          this.velocityX = 0; // Detener el movimiento horizontal
       }
       
-      gifPlayer.setX(gifPlayer.getX() + velocityX); // Aplica el movimiento en el eje X
+      this.gifPlayer.setX(this.gifPlayer.getX() + this.velocityX); // Aplica el movimiento en el eje X
       
       // Gravedad
-      if (!onGround) {
-        velocityY += gravity;  // La gravedad va aumentando la velocidad hacia abajo
-        gifPlayer.setY(gifPlayer.getY() + velocityY);  // Mueve al character hacia abajo
+      if (!this.onGround) {
+        this.velocityY += this.gravity;  // La gravedad va aumentando la velocidad hacia abajo
+        this.gifPlayer.setY(this.gifPlayer.getY() + this.velocityY);  // Mueve al character hacia abajo
       } else {
-        velocityY = 0;  // Resetea la velocidad Y cuando está en el suelo
+        this.velocityY = 0;  // Resetea la velocidad Y cuando está en el suelo
       }
       
       // Salto variable
-      if (moveUp && onGround && !isJumping) {
-        velocityY = jumpStrength; 
-        isJumping = true; 
-        jumpTime = 0; 
-        onGround = false;  
-      } else if (moveUp && isJumping && jumpTime < maxJumpTime) {
-        velocityY -= gravity; // Reduce la velocidad hacia abajo mientras mantienes el salto
-        jumpTime++; 
+      if (this.moveUp && this.onGround && !this.isJumping) {
+        this.velocityY = this.jumpStrength; 
+        this.isJumping = true; 
+        this.jumpTime = 0; 
+        this.onGround = false;  
+        game.playJumpSound();
+      } else if (this.moveUp && this.isJumping && this.jumpTime < this.maxJumpTime) {
+        this.velocityY -= this.gravity; // Reduce la velocidad hacia abajo mientras mantienes el salto
+        this.jumpTime++; 
       }
       
-      if (!moveUp && isJumping) {
-        isJumping = false; // Finaliza el salto si se suelta la tecla
+      if (!this.moveUp && this.isJumping) {
+        this.isJumping = false; // Finaliza el salto si se suelta la tecla
       }
       
       // PLATAFORMAS
       if (CollisionDetector.isColliding(index, mainCharacter, (SimpleList)game.getPlatforms(), backgroundOffset)) {
-        onGround = true;
-        isJumping = false;
+        this.onGround = true;
+        this.isJumping = false;
       } else {
-        onGround = false;
+        this.onGround = false;
       }
       
       // PINCHOS
-      if(!isInvulnerable){
+      if(!this.isInvulnerable){
         if (CollisionDetector.isCollidingWithSpikes(index, mainCharacter, (SimpleList)game.getSpikes(), backgroundOffset)) {
           mainCharacter.setLife(mainCharacter.getLife() - 1);
-          velocityY = -20;
-          isInvulnerable = true;
-          blinkTimer = 0;
+          this.velocityY = -20;
+          this.isInvulnerable = true;
+          this.blinkTimer = 0;
+          game.playSpikeHitSound();
         }
       }
       updateInvulnerability(); // Actualizar estado de inmunidad
       
       // Detener el character por colisión lateral
-      for (Node node = game.getPlatforms().PTR; node != null; node = node.next) {
-        Platform platform = (Platform) node.info;
+      for (Node node = game.getPlatforms().getPTR(); node != null; node = node.getNext()) {
+        Platform platform = (Platform) node.getInfo();
         if(platform.getIndex() == index){
             CollisionDetector.handleSideCollision(this, platform, backgroundOffset);
         }
-      }
-      
-      // Salto
-      if (moveUp && onGround) {
-        velocityY = jumpStrength;
-        onGround = false;  
       }
       
       constrainBorders(app);
@@ -172,37 +180,37 @@ public class Character {
   
   // Método para mostrar el GIF en la screen
   public void display(PApplet app) {
-    updateVibration(app); // Actualizar la vibración si está activa
-    if (isInvulnerable && (blinkTimer / 5) % 2 == 0) {
+    this.updateVibration(app); // Actualizar la vibración si está activa
+    if (this.isInvulnerable && (this.blinkTimer / 5) % 2 == 0) {
         // Parpadeo: no mostrar el personaje
         return;
     }
-    gifPlayer.display(app); // Mostrar el GIF del personaje
+    this.gifPlayer.display(app); // Mostrar el GIF del personaje
   }
   
   public void enemyDisplay(PApplet app, int xpos, int ypos){
-      gifPlayer.enemyDisplay(app, xpos, ypos); 
+      this.gifPlayer.enemyDisplay(app, xpos, ypos); 
   }
   
   public void constrainBorders(PApplet app){
     // Limitar la posición del character a los límites de la screen
-        if (gifPlayer.getX() < 340) {
-            gifPlayer.setX(340);
+        if (this.gifPlayer.getX() < 340) {
+            this.gifPlayer.setX(340);
         }
-        if (gifPlayer.getX() + gifPlayer.getWidth() > app.width - 450) {
-            gifPlayer.setX(app.width - gifPlayer.getWidth() - 450);
+        if (this.gifPlayer.getX() + this.gifPlayer.getWidth() > app.width - 450) {
+            this.gifPlayer.setX(app.width - this.gifPlayer.getWidth() - 450);
         }
-        if (gifPlayer.getY() < 0) {
-            gifPlayer.setY(0);
+        if (this.gifPlayer.getY() < 0) {
+            this.gifPlayer.setY(0);
         }
-        if (gifPlayer.getY() + gifPlayer.getHeight() > app.height) {
-            gifPlayer.setY(app.height - gifPlayer.getHeight());
+        if (this.gifPlayer.getY() + this.gifPlayer.getHeight() > app.height) {
+            this.gifPlayer.setY(app.height - this.gifPlayer.getHeight());
         }
   }
   
   public void updateLifeBar(PApplet app) {
-    if (isBlinking) {
-        handleBlink(app); // Control del parpadeo
+    if (this.isBlinking) {
+        this.handleBlink(app); // Control del parpadeo
     } else {
         // Dibujar la barra de vida correspondiente
         switch (this.life) {
@@ -245,20 +253,20 @@ public class Character {
   
   // Método para manejar el parpadeo
   private void handleBlink(PApplet app) {
-      if (blinkCount < blinkDuration) {
-          if (app.frameCount % blinkRate == 0) {
-              showFirstImage = !showFirstImage; // Alternar entre la barra actual y la anterior
+      if (this.blinkCount < this.blinkDuration) {
+          if (app.frameCount % this.blinkRate == 0) {
+              this.showFirstImage = !this.showFirstImage; // Alternar entre la barra actual y la anterior
           }
-          blinkCount++;
+          this.blinkCount++;
       } else {
-          isBlinking = false; // Detener el parpadeo
+          this.isBlinking = false; // Detener el parpadeo
       }
   
       // Dibujar la imagen correspondiente
-      if (showFirstImage) {
-          app.image(currentLifeBar, 50, 60);
+      if (this.showFirstImage) {
+          app.image(this.currentLifeBar, 50, 60);
       } else {
-          app.image(previousLifeBar, 50, 60);
+          app.image(this.previousLifeBar, 50, 60);
       }
   }
   
@@ -266,15 +274,15 @@ public class Character {
   public void setLife(int newLife) {
       if (this.life != newLife) {
           // Establecer la barra de vida actual y la anterior
-          previousLifeBar = getLifeBar(this.life); // Barra de vida antes del cambio
-          currentLifeBar = getLifeBar(newLife);   // Barra de vida después del cambio
+          this.previousLifeBar = getLifeBar(this.life); // Barra de vida antes del cambio
+          this.currentLifeBar = getLifeBar(newLife);   // Barra de vida después del cambio
   
           this.life = newLife; // Actualizar la vida
   
           // Iniciar el parpadeo
-          blinkCount = 0;
-          isBlinking = true;
-          showFirstImage = true;
+          this.blinkCount = 0;
+          this.isBlinking = true;
+          this.showFirstImage = true;
       }
   }
 
@@ -333,13 +341,13 @@ public class Character {
     return this.life;
   }
   
+  public GifPlayer getGifPlayer(){
+    return this.gifPlayer;
+  }
+  
   // Setters
   public void setMoveUp(boolean moveUp) {
     this.moveUp = moveUp;
-  }
-  
-  public void setMoveDown(boolean moveDown) {
-    this.moveDown = moveDown;
   }
   
   public void setMoveLeft(boolean moveLeft) {
